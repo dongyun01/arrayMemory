@@ -1,0 +1,127 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Diagnostics;
+
+namespace WindowsFormsApp8
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        public static readonly string[] whitelist =
+        {
+            "System",
+            "Idle",
+            "svchost",
+            "smss",
+            "RuntimeBroker",
+            "csrss",
+            "wininit",
+            "services",
+            "winlogon",
+            "lsass",
+            "dwm",
+            "fontdrvhost",
+            "spoolsv",
+            "MsMpEng",
+            "dllhost",
+            "WmiPrvSE",
+            "sihost",
+            "taskhostw",
+            "msdtc",
+            "SearchIndexer",
+            "TrustedInstaller",
+            "explorer",
+            "CompatTelRunner",
+            "SearchUI",
+            "NisSrv",
+            "ShellExperienceHost",
+            "TiWorker",
+            "MSASCuiL",
+            "installAgentUserBroker",
+            "conhost",
+            "InstallAgent",
+            "Memory Compression",
+            "SecurityHealthService",
+            "audiodg",
+            "BackgroundTransferHost"
+        };
+        public void button1_Click(object sender, EventArgs e)
+        {
+            label3.Text = "State : 진행중";
+         
+            var processes = Process.GetProcesses();
+
+
+            var currentProcess = Process.GetCurrentProcess();
+
+   
+            foreach (var process in processes)
+            {
+     
+                if (process.Id == currentProcess.Id)
+                {
+               
+                    continue;
+                }
+
+
+                if (!whitelist.Contains(process.ProcessName))
+                {
+              
+                    try
+                    {
+                        //해당 프로세스 종료
+                        process.Kill();
+                        listBox1.Items.Add(process.ProcessName);
+                    }
+                    catch (Exception error /*발생한 오류에 대한 정보가 error 변수에 담김*/)
+                    {
+                        listBox2.Items.Add(process.ProcessName);
+                        listBox3.Items.Add(process.ProcessName + " : " + error.Message);
+                    }
+                }
+            }
+            label3.Text = "State : 완료";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+        
+            if (listBox2.Items.Count != 0) {
+                if (listBox3.Visible == false)
+                {
+                    listBox2.Visible = false;
+                    listBox1.Visible = false;
+                    listBox3.Visible = true;
+                    button2.Text = "닫기";
+                }
+                else
+                {
+                    listBox2.Visible = true;
+                    listBox1.Visible = true;
+                    listBox3.Visible = false;
+                    button2.Text = "종료 불가 목록";
+                }
+            }
+            else  if(listBox1.Items.Count == 0 && listBox2.TopIndex == 0)
+            {
+                MessageBox.Show("먼저 초기화를 진행해주세요.", "알림");
+            }
+            else
+            {
+                MessageBox.Show("종료되지 않은 프로세스가 없습니다.","알림");
+            }
+        }
+    }
+}
